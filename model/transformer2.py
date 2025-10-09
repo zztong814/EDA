@@ -138,7 +138,7 @@ class MultiInputTransformer(nn.Module):
     接口: model(input, craft, taskid)
     - input:  [batch, 13]    (连续特征)
     - craft:  [batch, 1]     (数值)
-    - taskid: [batch, 2]     (两位二进制，float 或 long->one-hot)
+    - taskid: [batch, 1]     (1234)
     输出:
     - [batch, 13]  （对应 input 的预测）
     """
@@ -147,7 +147,7 @@ class MultiInputTransformer(nn.Module):
         # 将三部分分别投影到 d_model
         self.input_proj = nn.Linear(13, d_model)
         self.craft_proj = nn.Linear(1, d_model)
-        self.task_proj = nn.Linear(2, d_model)
+        self.task_embed = nn.Embedding(5, d_model)
 
         # 不启用位置编码
         # self.pos_enc = PositionalEncoding(d_model, max_len=3, dropout=dropout)
@@ -170,15 +170,16 @@ class MultiInputTransformer(nn.Module):
         """
         input_vec: [batch,  13]
         craft:     [batch,  1]
-        taskid:    [batch,  2]
+        taskid:    [batch,  1]
         """
         input_vec = input_vec.unsqueeze(1)
         craft = craft.unsqueeze(1)
-        taskid = taskid.unsqueeze(1)
+        #taskid = taskid.unsqueeze(1)
         # 投影
         i = self.input_proj(input_vec)   # [batch, 1, d_model]
         c = self.craft_proj(craft)       # [batch, 1, d_model]
-        t = self.task_proj(taskid)       # [batch, 1, d_model]
+        #t = self.task_proj(taskid)       # [batch, 1, d_model]
+        t = self.task_embed(taskid.squeeze(-1).long()).unsqueeze(1)  # [batch, 1, d_model]
 
         # 拼接成 seq_len = 3
         x = torch.cat([i, c, t], dim=1)  # [batch, 3, d_model]
@@ -206,7 +207,7 @@ if __name__ == "__main__":
     input_vec = torch.randn(batch, 13, device=device)          # 实数特征
     craft = torch.randn(batch, 1, device=device)               # 实数工艺参数
     # taskid 用二进制表示，例如 '01' -> [0,1]
-    taskid = torch.tensor([[0,0],[0,1],[1,0],[1,1]], dtype=torch.float)            # shape [1,1,2]
+    taskid = torch.tensor([[1], [2], [3], [4]])            # shape [1,1,2]
 
     out = model(input_vec, craft, taskid)
     print("output shape:", out.shape)     # expected: [1, 13]
