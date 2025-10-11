@@ -183,17 +183,26 @@ class MultiInputTransformer(nn.Module):
 
         # 输出层：把第一个 token 映射回 13 维
         # self.output = nn.Linear(d_model, 13)
-        self.forwardinf_decoder = nn.Sequential(
+        self.A_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.Tanh(),
             nn.Linear(64, 13)
         )
-        self.backwardinf_decoder = nn.Sequential(
+        self.B_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.Tanh(),
             nn.Linear(64, 13)
         )
-
+        self.C_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 13)
+        )
+        self.D_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 13)
+        )
         # 初始化
         for p in self.parameters():
             if p.dim() > 1:
@@ -224,27 +233,23 @@ class MultiInputTransformer(nn.Module):
         # x = self.pos_enc(x)
 
         # Encoder
-        memory = self.encoder(y, mask)   # [batch, 3, d_model]
+        memory = self.encoder(y, mask)   # [batch, 15, d_model]
         pooled = memory.mean(dim=1)  # [batch, d_model]
 
         # 取第一个 token（对应 input）的表示作为输出
-        if isinstance(taskid, int):
-            if taskid in [1, 2]:
-                out = self.forwardinf_decoder(pooled)
-            elif taskid in [3, 4]:
-                out = self.backwardinf_decoder(pooled)
+
+        out = torch.zeros(pooled.size(0), 13, device=pooled.device)
+        for i, tid in enumerate(taskid):
+            if tid.item() == 1:
+                out[i] = self.A_decoder(pooled[i])
+            elif tid.item() == 2:
+                out[i] = self.B_decoder(pooled[i])
+            elif tid.item() == 3:
+                out[i] = self.C_decoder(pooled[i])
+            elif tid.item() == 4:
+                out[i] = self.D_decoder(pooled[i])
             else:
-                raise ValueError(f"未知 taskid: {taskid}")
-        else:
-            # 如果 taskid 是 batch tensor（支持不同样本不同task）
-            out = torch.zeros(pooled.size(0), 13, device=pooled.device)
-            for i, tid in enumerate(taskid):
-                if tid.item() in [1, 2]:
-                    out[i] = self.forwardinf_decoder(pooled[i])
-                elif tid.item() in [3, 4]:
-                    out[i] = self.backwardinf_decoder(pooled[i])
-                else:
-                    raise ValueError(f"未知 taskid: {tid.item()}")
+                raise ValueError(f"未知 taskid: {tid.item()}")
 
         return out
 
@@ -279,11 +284,4 @@ if __name__ == "__main__":
     print("Output sample:")
     print(out)
 
-    # ====== 验证任务分支逻辑 ======
-    print("\n--- Branch check ---")
-    for i, tid in enumerate(taskid.squeeze()):
-        if tid.item() in [1, 2]:
-            print(f"Sample {i}: task {tid.item()} → 使用 group1_decoder")
-        elif tid.item() in [3, 4]:
-            print(f"Sample {i}: task {tid.item()} → 使用 group2_decoder")
 
