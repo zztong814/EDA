@@ -182,7 +182,17 @@ class MultiInputTransformer(nn.Module):
         self.encoder = Encoder(encoder_layer, N)
 
         # 输出层：把第一个 token 映射回 13 维
-        self.output = nn.Linear(d_model, 13)
+        # self.output = nn.Linear(d_model, 13)
+        self.forwardinf_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 13)
+        )
+        self.backwardinf_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 13)
+        )
 
         # 初始化
         for p in self.parameters():
@@ -215,26 +225,65 @@ class MultiInputTransformer(nn.Module):
 
         # Encoder
         memory = self.encoder(y, mask)   # [batch, 3, d_model]
+        pooled = memory.mean(dim=1)  # [batch, d_model]
 
         # 取第一个 token（对应 input）的表示作为输出
-        out_vec = self.output(memory[:, 0, :])  # [batch, 13]
-        return out_vec
+        if isinstance(taskid, int):
+            if taskid in [1, 2]:
+                out = self.forwardinf_decoder(pooled)
+            elif taskid in [3, 4]:
+                out = self.backwardinf_decoder(pooled)
+            else:
+                raise ValueError(f"未知 taskid: {taskid}")
+        else:
+            # 如果 taskid 是 batch tensor（支持不同样本不同task）
+            out = torch.zeros(pooled.size(0), 13, device=pooled.device)
+            for i, tid in enumerate(taskid):
+                if tid.item() in [1, 2]:
+                    out[i] = self.forwardinf_decoder(pooled[i])
+                elif tid.item() in [3, 4]:
+                    out[i] = self.backwardinf_decoder(pooled[i])
+                else:
+                    raise ValueError(f"未知 taskid: {tid.item()}")
+
+        return out
 
 
 # ----------------------------- 测试脚本 -----------------------------
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    # ====== 实例化模型 ======
     model = MultiInputTransformer(d_model=128, N=3, d_ff=512, h=4, dropout=0.1).to(device)
     model.eval()
 
-    # batch 示例（batch=1）
+    # ====== 构造测试输入 ======
     batch = 4
-    input_vec = torch.randn(batch, 13, device=device)          # 实数特征
-    craft = torch.randn(batch, 1, device=device)               # 实数工艺参数
-    # taskid 用二进制表示，例如 '01' -> [0,1]
-    taskid = torch.randn(batch, 1, device=device)            # shape [1,1,2]
+    input_vec = torch.randn(batch, 13, device=device)   # 连续特征
+    craft = torch.randn(batch, 1, device=device)        # 工艺特征
 
-    out = model(input_vec, craft, taskid)
-    print("output shape:", out.shape)     # expected: [1, 13]
-    print("output:", out.detach().cpu().numpy())
+    # 不同样本的任务编号（1、2 走 group1；3、4 走 group2）
+    taskid = torch.tensor([[1], [2], [3], [4]], dtype=torch.long, device=device)
+
+    # ====== 前向推理 ======
+    with torch.no_grad():
+        out = model(input_vec, craft, taskid)
+
+    # ====== 输出检查 ======
+    print(f"Input shape : {input_vec.shape}")
+    print(f"Craft shape : {craft.shape}")
+    print(f"TaskID shape: {taskid.shape}")
+    print(f"Output shape: {out.shape}")
+    print("Output sample:")
+    print(out)
+
+    # ====== 验证任务分支逻辑 ======
+    print("\n--- Branch check ---")
+    for i, tid in enumerate(taskid.squeeze()):
+        if tid.item() in [1, 2]:
+            print(f"Sample {i}: task {tid.item()} → 使用 group1_decoder")
+        elif tid.item() in [3, 4]:
+            print(f"Sample {i}: task {tid.item()} → 使用 group2_decoder")
+
