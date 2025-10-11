@@ -269,43 +269,47 @@ def get_dataset_default(target_technology_ratio):
 
 # 测试代码，用前可以参考一下
 if __name__ == "__main__":
-    p1 = 'dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
-    p2 = 'dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
-    p3 = 'dataset/01_train_set/5t_opamp/target/target_design_features.csv'
-    p4 = 'dataset/01_train_set/5t_opamp/target/target_targets.csv'
-    p5 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
-    p6 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
-    p7 = 'dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
-    p8 = 'dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
-#     p9 = '02_public_test_set/features/features_A.csv'
-#     p10 = '02_public_test_set/features/features_B.csv'
-#     p11 = '02_public_test_set/features/features_C.csv'
-#     p12 = '02_public_test_set/features/features_D.csv'
+    # p1 = 'dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
+    # p2 = 'dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
+    # p3 = 'dataset/01_train_set/5t_opamp/target/target_design_features.csv'
+    # p4 = 'dataset/01_train_set/5t_opamp/target/target_targets.csv'
+    # p5 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
+    # p6 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
+    # p7 = 'dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
+    # p8 = 'dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
+    # p9 = '02_public_test_set/features/features_A.csv'
+    # p10 = '02_public_test_set/features/features_B.csv'
+    # p11 = '02_public_test_set/features/features_C.csv'
+    # p12 = '02_public_test_set/features/features_D.csv'
 
-#     A_test_data_iter = load_validate_data(10, True, TaskID.task_A, TechnologyType.target_tech, p9)
-#     for input, task_id, technology_type in  A_test_data_iter:
-#         print(input, task_id, technology_type)
-#     B_test_data_iter = load_validate_data(10, True, TaskID.task_B, TechnologyType.target_tech, p10)
-#     for input, task_id, technology_type in  A_test_data_iter:
-#         print(input, task_id, technology_type)
-#     C_test_data_iter = load_validate_data(10, True, TaskID.task_C, TechnologyType.target_tech, p11)
-#     for input, task_id, technology_type in  A_test_data_iter:
-#         print(input, task_id, technology_type)
-#     D_test_data_iter = load_validate_data(10, True, TaskID.task_D, TechnologyType.target_tech, p12)
-#     for input, task_id, technology_type in  A_test_data_iter:
-#         print(input, task_id, technology_type)
+    # A_test_data_iter = load_validate_data(10, True, TaskID.task_A, TechnologyType.target_tech, p9)
+    # for input, task_id, technology_type in  A_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # B_test_data_iter = load_validate_data(10, True, TaskID.task_B, TechnologyType.target_tech, p10)
+    # for input, task_id, technology_type in  A_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # C_test_data_iter = load_validate_data(10, True, TaskID.task_C, TechnologyType.target_tech, p11)
+    # for input, task_id, technology_type in  A_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # D_test_data_iter = load_validate_data(10, True, TaskID.task_D, TechnologyType.target_tech, p12)
+    # for input, task_id, technology_type in  A_test_data_iter:
+    #     print(input, task_id, technology_type)
     
-    path_list = [p1,p2,p3,p4,p5,p6,p7,p8]
-    train_set, test_set_A, test_set_B, test_set_C, test_set_D=get_dataset(path_list, 0.9)
-    print(train_set[0])
-#     train_data_iter, A_test_data_iter, B_test_data_iter, C_test_data_iter, D_test_data_iter = load_train_and_test_data(10, True, path_list, 0.9)
-#     for input, output, task_id, technology_type in A_test_data_iter:
-#         print(input, task_id, technology_type)
-#     for input, output, task_id, technology_type in B_test_data_iter:
-#         print(input, task_id, technology_type)
-#     for input, output, task_id, technology_type in C_test_data_iter:
-#         print(input, task_id, technology_type)
-#     for input, output, task_id, technology_type in D_test_data_iter:
-#         print(input, task_id, technology_type)
-#     for input, output, task_id, technology_type in train_data_iter:
-#         print(input, task_id, technology_type)
+    # path_list = [p1,p2,p3,p4,p5,p6,p7,p8]
+    # train_set, test_set_A, test_set_B, test_set_C, test_set_D=get_dataset(path_list, 0.9)
+    # print(train_set[0])
+
+    # train_data_iter, A_test_data_iter, B_test_data_iter, C_test_data_iter, D_test_data_iter = load_train_and_test_data(10, True, path_list, 0.9)
+    # for input, output, task_id, technology_type in A_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # for input, output, task_id, technology_type in B_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # for input, output, task_id, technology_type in C_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # for input, output, task_id, technology_type in D_test_data_iter:
+    #     print(input, task_id, technology_type)
+    # for input, output, task_id, technology_type in train_data_iter:
+    #     print(input, task_id, technology_type)
+
+    train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D = get_dataset_four_models(0.9)
+    print(train_set_A[0])
