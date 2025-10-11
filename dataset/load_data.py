@@ -66,7 +66,10 @@ def pad_to_13(df):
 
 def min_max_normalization(df):
     for col in df.columns:
-        df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
+        if (df[col].min() == df[col].max()):
+            df[col] = 1
+        else:
+            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
 
 def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     A = A_input_df.copy()
@@ -123,22 +126,22 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     A_test_input_df = target_features_5t_df.iloc[A_k:].reset_index(drop=True)
     A_train_output_df = pd.concat([source_targets_5t_df, target_targets_5t_df.iloc[:A_k]], ignore_index=True)
     A_test_output_df = target_targets_5t_df.iloc[A_k:].reset_index(drop=True)
-    # B任务（5t反推）
-    B_train_input_df = A_train_output_df
-    B_test_input_df = A_test_output_df
-    B_train_output_df = A_train_input_df
-    B_test_output_df = A_test_input_df
-    # C任务（two_stage正推）
-    C_k = int(len(target_features_two_stage_df) * target_technology_ratio)
-    C_train_input_df = pd.concat([source_features_two_stage_df, target_features_two_stage_df.iloc[:C_k]], ignore_index=True)
-    C_test_input_df = target_features_two_stage_df.iloc[C_k:].reset_index(drop=True)
-    C_train_output_df = pd.concat([source_targets_two_stage_df, target_targets_two_stage_df.iloc[:C_k]], ignore_index=True)
-    C_test_output_df = target_targets_two_stage_df.iloc[C_k:].reset_index(drop=True)
+    # B任务（two_stage正推）
+    B_k = int(len(target_features_two_stage_df) * target_technology_ratio)
+    B_train_input_df = pd.concat([source_features_two_stage_df, target_features_two_stage_df.iloc[:B_k]], ignore_index=True)
+    B_test_input_df = target_features_two_stage_df.iloc[B_k:].reset_index(drop=True)
+    B_train_output_df = pd.concat([source_targets_two_stage_df, target_targets_two_stage_df.iloc[:B_k]], ignore_index=True)
+    B_test_output_df = target_targets_two_stage_df.iloc[B_k:].reset_index(drop=True)
+    # C任务（5t反推）
+    C_train_input_df = A_train_output_df
+    C_test_input_df = A_test_output_df
+    C_train_output_df = A_train_input_df
+    C_test_output_df = A_test_input_df
     # D任务（two_stage反推）
-    D_train_input_df = C_train_output_df
-    D_test_input_df = C_test_output_df
-    D_train_output_df = C_train_input_df
-    D_test_output_df = C_test_input_df
+    D_train_input_df = B_train_output_df
+    D_test_input_df = B_test_output_df
+    D_train_output_df = B_train_input_df
+    D_test_output_df = B_test_input_df
     # task_id
     A_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_train_input_df))})
     A_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_test_input_df))})
@@ -151,12 +154,12 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     # technology_type
     A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_5t_df) + [2] * A_k})
     A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_5t_df) - A_k)})
-    B_train_technology_type_df = A_train_technology_type_df
-    B_test_technology_type_df = A_test_technology_type_df
-    C_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_two_stage_df) + [2] * C_k})
-    C_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_two_stage_df) - C_k)})
-    D_train_technology_type_df = C_train_technology_type_df
-    D_test_technology_type_df = C_test_technology_type_df
+    B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_two_stage_df) + [2] * B_k})
+    B_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_two_stage_df) - B_k)})
+    C_train_technology_type_df = A_train_technology_type_df
+    C_test_technology_type_df = A_test_technology_type_df
+    D_train_technology_type_df = B_train_technology_type_df
+    D_test_technology_type_df = B_test_technology_type_df
 
     df_tuple = (A_train_input_df, B_train_input_df, C_train_input_df, D_train_input_df, 
                 A_train_output_df, B_train_output_df, C_train_output_df, D_train_output_df, 
@@ -243,7 +246,7 @@ def get_dataset_default(target_technology_ratio, normalize):
 
 # 测试代码，用前可以参考一下
 if __name__ == "__main__":
-    train_dataset, A_test_dataset, B_test_dataset, C_test_dataset, D_test_dataset = get_dataset_default(0, True)
-    for input, output, task_id, technology_type in DataLoader(train_dataset):
+    train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D = get_dataset_four_models(0.8, True)
+    for input, output, task_id, technology_type in DataLoader(test_set_C):
         print(input, '\n', output, '\n', task_id, '\n', technology_type)
         print('————————————————————————————')
