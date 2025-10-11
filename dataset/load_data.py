@@ -64,97 +64,6 @@ def pad_to_13(df):
     for i in range(df.shape[1], 13):
         df[i] = 0
 
-def load_validate_data(batch_size, shuffle, task_id:TaskID, technology_type:TechnologyType, file_path):
-    features_for_test_df = pd.read_csv(file_path)
-    pad_to_13(features_for_test_df)
-    task_id_for_test_df = pd.DataFrame({'task_id': [task_id.value] * len(features_for_test_df)})
-    technology_type_for_test_df = pd.DataFrame({'technology_type': [technology_type.value] * len(features_for_test_df)})
-    validate_dataset = OpampDataset(input = features_for_test_df, task_id = task_id_for_test_df, technology_type = technology_type_for_test_df)
-    validate_data_iter = DataLoader(validate_dataset, batch_size, shuffle)
-    return validate_data_iter
-
-def load_train_and_test_data(batch_size, shuffle, file_paths, target_technology_ratio):
-    """
-    file_path[:]依次输入的地址为
-    [5t源工艺特征，5t源工艺性能，5t目标工艺特征，5t目标工艺性能，
-    two_stage源工艺特征，two_stage源工艺性能，two_stage目标工艺特征，two_stage目标工艺性能]
-    """
-    source_features_5t_df = pd.read_csv(file_paths[0])
-    source_targets_5t_df = pd.read_csv(file_paths[1])
-    target_features_5t_df = pd.read_csv(file_paths[2])
-    target_targets_5t_df = pd.read_csv(file_paths[3])
-    source_features_two_stage_df = pd.read_csv(file_paths[4])
-    source_targets_two_stage_df = pd.read_csv(file_paths[5])
-    target_features_two_stage_df = pd.read_csv(file_paths[6])
-    target_targets_two_stage_df = pd.read_csv(file_paths[7])
-    pad_to_13(source_features_5t_df)
-    pad_to_13(source_targets_5t_df)
-    pad_to_13(target_features_5t_df)
-    pad_to_13(target_targets_5t_df)
-    pad_to_13(source_features_two_stage_df)
-    pad_to_13(source_targets_two_stage_df)
-    pad_to_13(target_features_two_stage_df)
-    pad_to_13(target_targets_two_stage_df)
-    # 根据目标工艺占比生成A、B、C、D四个任务对应的输入和输出
-    # A任务（5t正推）
-    A_k = int(len(target_features_5t_df) * target_technology_ratio)
-    A_train_input_df = pd.concat([source_features_5t_df, target_features_5t_df.iloc[:A_k]], ignore_index=True)
-    A_test_input_df = target_features_5t_df.iloc[A_k:].reset_index(drop=True)
-    A_train_output_df = pd.concat([source_targets_5t_df, target_targets_5t_df.iloc[:A_k]], ignore_index=True)
-    A_test_output_df = target_targets_5t_df.iloc[A_k:].reset_index(drop=True)
-    # B任务（5t反推）
-    B_train_input_df = A_train_output_df
-    B_test_input_df = A_test_output_df
-    B_train_output_df = A_train_input_df
-    B_test_output_df = A_test_input_df
-    # C任务（two_stage正推）
-    C_k = int(len(target_features_two_stage_df) * target_technology_ratio)
-    C_train_input_df = pd.concat([source_features_two_stage_df, target_features_two_stage_df.iloc[:C_k]], ignore_index=True)
-    C_test_input_df = target_features_two_stage_df.iloc[C_k:].reset_index(drop=True)
-    C_train_output_df = pd.concat([source_targets_two_stage_df, target_targets_two_stage_df.iloc[:C_k]], ignore_index=True)
-    C_test_output_df = target_targets_two_stage_df.iloc[C_k:].reset_index(drop=True)
-    # D任务（two_stage反推）
-    D_train_input_df = C_train_output_df
-    D_test_input_df = C_test_output_df
-    D_train_output_df = C_train_input_df
-    D_test_output_df = C_test_input_df
-    # task_id
-    A_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_train_input_df))})
-    A_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_test_input_df))})
-    B_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_train_input_df))})
-    B_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_test_input_df))})
-    C_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_train_input_df))})
-    C_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_test_input_df))})
-    D_train_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_train_input_df))})
-    D_test_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_test_input_df))})
-    # technology_type
-    A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_5t_df) + [2] * A_k})
-    A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_5t_df) - A_k)})
-    B_train_technology_type_df = A_train_technology_type_df
-    B_test_technology_type_df = A_test_technology_type_df
-    C_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_two_stage_df) + [2] * C_k})
-    C_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_two_stage_df) - C_k)})
-    D_train_technology_type_df = C_train_technology_type_df
-    D_test_technology_type_df = C_test_technology_type_df                                                         
-    # 合并
-    train_input_df = pd.concat([A_train_input_df, B_train_input_df, C_train_input_df, D_train_input_df,], ignore_index=True)
-    train_output_df = pd.concat([A_train_output_df, B_train_output_df, C_train_output_df, D_train_output_df,], ignore_index=True)
-    train_task_id_df = pd.concat([A_train_task_id_df, B_train_task_id_df, C_train_task_id_df, D_train_task_id_df,], ignore_index=True)
-    train_technology_type_df = pd.concat([A_train_technology_type_df, B_train_technology_type_df, C_train_technology_type_df, D_train_technology_type_df,], ignore_index=True)
-    # Dataset
-    train_dataset = OpampDataset(input = train_input_df, output = train_output_df, task_id = train_task_id_df, technology_type = train_technology_type_df)
-    A_test_dataset = OpampDataset(input = A_test_input_df, output = A_test_output_df, task_id = A_test_task_id_df, technology_type = A_test_technology_type_df)
-    B_test_dataset = OpampDataset(input = B_test_input_df, output = B_test_output_df, task_id = B_test_task_id_df, technology_type = B_test_technology_type_df)
-    C_test_dataset = OpampDataset(input = C_test_input_df, output = C_test_output_df, task_id = C_test_task_id_df, technology_type = C_test_technology_type_df)
-    D_test_dataset = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
-    train_data_iter = DataLoader(train_dataset, batch_size, shuffle)
-    A_test_data_iter = DataLoader(A_test_dataset, batch_size, shuffle)
-    B_test_data_iter = DataLoader(B_test_dataset, batch_size, shuffle)
-    C_test_data_iter = DataLoader(C_test_dataset, batch_size, shuffle)
-    D_test_data_iter = DataLoader(D_test_dataset, batch_size, shuffle)
-    # return
-    return train_data_iter, A_test_data_iter, B_test_data_iter, C_test_data_iter, D_test_data_iter
-
 def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     A = A_input_df.copy()
     B = B_input_df.copy()
@@ -168,6 +77,15 @@ def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
 
     output_df = pd.concat([A, B, C, D], ignore_index=True)
     return output_df
+
+def load_validate_data(batch_size, shuffle, task_id:TaskID, technology_type:TechnologyType, file_path):
+    features_for_test_df = pd.read_csv(file_path)
+    pad_to_13(features_for_test_df)
+    task_id_for_test_df = pd.DataFrame({'task_id': [task_id.value] * len(features_for_test_df)})
+    technology_type_for_test_df = pd.DataFrame({'technology_type': [technology_type.value] * len(features_for_test_df)})
+    validate_dataset = OpampDataset(input = features_for_test_df, task_id = task_id_for_test_df, technology_type = technology_type_for_test_df)
+    validate_data_iter = DataLoader(validate_dataset, batch_size, shuffle)
+    return validate_data_iter
 
 def get_dataset(file_paths, target_technology_ratio):
     """
@@ -245,6 +163,97 @@ def get_dataset(file_paths, target_technology_ratio):
     C_test_dataset = OpampDataset(input = C_test_input_df, output = C_test_output_df, task_id = C_test_task_id_df, technology_type = C_test_technology_type_df)
     D_test_dataset = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
     return train_dataset, A_test_dataset, B_test_dataset, C_test_dataset, D_test_dataset
+
+def load_train_and_test_data(batch_size, shuffle, file_paths, target_technology_ratio):
+    """
+    file_path[:]依次输入的地址为
+    [5t源工艺特征，5t源工艺性能，5t目标工艺特征，5t目标工艺性能，
+    two_stage源工艺特征，two_stage源工艺性能，two_stage目标工艺特征，two_stage目标工艺性能]
+    """
+    train_dataset, A_test_dataset, B_test_dataset, C_test_dataset, D_test_dataset = get_dataset(file_paths, target_technology_ratio)
+    train_data_iter = DataLoader(train_dataset, batch_size, shuffle)
+    A_test_data_iter = DataLoader(A_test_dataset, batch_size, shuffle)
+    B_test_data_iter = DataLoader(B_test_dataset, batch_size, shuffle)
+    C_test_data_iter = DataLoader(C_test_dataset, batch_size, shuffle)
+    D_test_data_iter = DataLoader(D_test_dataset, batch_size, shuffle)
+    # return
+    return train_data_iter, A_test_data_iter, B_test_data_iter, C_test_data_iter, D_test_data_iter
+
+def get_dataset_four_models(target_technology_ratio):
+    p1 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
+    p2 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
+    p3 = 'dataset/dataset/01_train_set/5t_opamp/target/target_design_features.csv'
+    p4 = 'dataset/dataset/01_train_set/5t_opamp/target/target_targets.csv'
+    p5 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
+    p6 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
+    p7 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
+    p8 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
+    source_features_5t_df = pd.read_csv(p1)
+    source_targets_5t_df = pd.read_csv(p2)
+    target_features_5t_df = pd.read_csv(p3)
+    target_targets_5t_df = pd.read_csv(p4)
+    source_features_two_stage_df = pd.read_csv(p5)
+    source_targets_two_stage_df = pd.read_csv(p6)
+    target_features_two_stage_df = pd.read_csv(p7)
+    target_targets_two_stage_df = pd.read_csv(p8)
+    pad_to_13(source_features_5t_df)
+    pad_to_13(source_targets_5t_df)
+    pad_to_13(target_features_5t_df)
+    pad_to_13(target_targets_5t_df)
+    pad_to_13(source_features_two_stage_df)
+    pad_to_13(source_targets_two_stage_df)
+    pad_to_13(target_features_two_stage_df)
+    pad_to_13(target_targets_two_stage_df)
+    # 根据目标工艺占比生成A、B、C、D四个任务对应的输入和输出
+    # A任务（5t正推）
+    A_k = int(len(target_features_5t_df) * target_technology_ratio)
+    A_train_input_df = pd.concat([source_features_5t_df, target_features_5t_df.iloc[:A_k]], ignore_index=True)
+    A_test_input_df = target_features_5t_df.iloc[A_k:].reset_index(drop=True)
+    A_train_output_df = pd.concat([source_targets_5t_df, target_targets_5t_df.iloc[:A_k]], ignore_index=True)
+    A_test_output_df = target_targets_5t_df.iloc[A_k:].reset_index(drop=True)
+    # B任务（5t反推）
+    B_train_input_df = A_train_output_df
+    B_test_input_df = A_test_output_df
+    B_train_output_df = A_train_input_df
+    B_test_output_df = A_test_input_df
+    # C任务（two_stage正推）
+    C_k = int(len(target_features_two_stage_df) * target_technology_ratio)
+    C_train_input_df = pd.concat([source_features_two_stage_df, target_features_two_stage_df.iloc[:C_k]], ignore_index=True)
+    C_test_input_df = target_features_two_stage_df.iloc[C_k:].reset_index(drop=True)
+    C_train_output_df = pd.concat([source_targets_two_stage_df, target_targets_two_stage_df.iloc[:C_k]], ignore_index=True)
+    C_test_output_df = target_targets_two_stage_df.iloc[C_k:].reset_index(drop=True)
+    # D任务（two_stage反推）
+    D_train_input_df = C_train_output_df
+    D_test_input_df = C_test_output_df
+    D_train_output_df = C_train_input_df
+    D_test_output_df = C_test_input_df
+    # task_id
+    A_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_train_input_df))})
+    A_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_test_input_df))})
+    B_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_train_input_df))})
+    B_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_test_input_df))})
+    C_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_train_input_df))})
+    C_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_test_input_df))})
+    D_train_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_train_input_df))})
+    D_test_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_test_input_df))})
+    # technology_type
+    A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_5t_df) + [2] * A_k})
+    A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_5t_df) - A_k)})
+    B_train_technology_type_df = A_train_technology_type_df
+    B_test_technology_type_df = A_test_technology_type_df
+    C_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_two_stage_df) + [2] * C_k})
+    C_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_two_stage_df) - C_k)})
+    D_train_technology_type_df = C_train_technology_type_df
+    D_test_technology_type_df = C_test_technology_type_df
+    train_set_A = OpampDataset(input = A_train_input_df, output = A_train_output_df, task_id = A_train_task_id_df, technology_type = A_train_technology_type_df)
+    train_set_B = OpampDataset(input = B_train_input_df, output = B_train_output_df, task_id = B_train_task_id_df, technology_type = B_train_technology_type_df)
+    train_set_C = OpampDataset(input = C_train_input_df, output = C_train_output_df, task_id = C_train_task_id_df, technology_type = C_train_technology_type_df)
+    train_set_D = OpampDataset(input = D_train_input_df, output = D_train_output_df, task_id = D_train_task_id_df, technology_type = D_train_technology_type_df)
+    test_set_A = OpampDataset(input = A_test_input_df, output = A_test_output_df, task_id = A_test_task_id_df, technology_type = A_test_technology_type_df)
+    test_set_B = OpampDataset(input = B_test_input_df, output = B_test_output_df, task_id = B_test_task_id_df, technology_type = B_test_technology_type_df)
+    test_set_C = OpampDataset(input = C_test_input_df, output = C_test_output_df, task_id = C_test_task_id_df, technology_type = C_test_technology_type_df)
+    test_set_D = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
+    return train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D
 
 def get_dataset_default(target_technology_ratio):
     p1 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
