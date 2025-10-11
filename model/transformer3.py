@@ -186,17 +186,17 @@ class MultiInputTransformer(nn.Module):
         self.A_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.Tanh(),
-            nn.Linear(64, 13)
+            nn.Linear(64, 5)
         )
         self.B_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.Tanh(),
-            nn.Linear(64, 13)
+            nn.Linear(64, 5)
         )
         self.C_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.Tanh(),
-            nn.Linear(64, 13)
+            nn.Linear(64, 7)
         )
         self.D_decoder = nn.Sequential(
             nn.Linear(d_model, 64),
@@ -241,16 +241,18 @@ class MultiInputTransformer(nn.Module):
         out = torch.zeros(pooled.size(0), 13, device=pooled.device)
         for i, tid in enumerate(taskid):
             if tid.item() == 1:
-                out[i] = self.A_decoder(pooled[i])
+                pred = self.A_decoder(pooled[i])
+                out[i, :5] = pred  # 填充前5个
             elif tid.item() == 2:
-                out[i] = self.B_decoder(pooled[i])
+                pred = self.B_decoder(pooled[i])
+                out[i, :5] = pred  # 填充前5个
             elif tid.item() == 3:
-                out[i] = self.C_decoder(pooled[i])
+                pred = self.C_decoder(pooled[i])
+                out[i, :7] = pred  # 填充前5个
             elif tid.item() == 4:
                 out[i] = self.D_decoder(pooled[i])
             else:
                 raise ValueError(f"未知 taskid: {tid.item()}")
-
         return out
 
 
