@@ -130,8 +130,30 @@ class Encoder(nn.Module):
             x = layer(x, mask)
         return self.norm(x)
 
+# ----------------------------- MLP embedding -----------------------------
+class MLP(nn.Module):
+    def __init__(self, n: int, hidden_dim: int = 64):
+        """
+        参数:
+            n: 输出维度 (最终输出为 [batch, 15, n])
+            hidden_dim: 隐藏层维度，可自行调整
+        """
+        super(MLP, self).__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(1, hidden_dim),
+            nn.Sigmoid(),
+            nn.Linear(hidden_dim, n)
+        )
 
+    def forward(self, x):
+        """
+        x: [batch, 15, 1]
+        输出: [batch, 15, n]
+        """
+        out = self.mlp(x)  # 线性层会自动在最后一个维度上操作
+        return out
 # ----------------------------- Multi-input Transformer -----------------------------
+
 
 class MultiInputTransformer(nn.Module):
     """
@@ -145,9 +167,10 @@ class MultiInputTransformer(nn.Module):
     def __init__(self, d_model=128, N=4, d_ff=512, h=4, dropout=0.1):
         super().__init__()
         # 将三部分分别投影到 d_model
-        self.input_proj = nn.Linear(13, d_model)
-        self.craft_proj = nn.Linear(1, d_model)
-        self.task_embed = nn.Embedding(5, d_model)
+        # self.input_proj = nn.Linear(13, d_model)
+        # self.craft_proj = nn.Linear(1, d_model)
+        # self.task_embed = nn.Embedding(5, d_model)
+        self.mlp_embed = MLP(d_model)
 
         # 不启用位置编码
         # self.pos_enc = PositionalEncoding(d_model, max_len=3, dropout=dropout)
@@ -159,8 +182,27 @@ class MultiInputTransformer(nn.Module):
         self.encoder = Encoder(encoder_layer, N)
 
         # 输出层：把第一个 token 映射回 13 维
-        self.output = nn.Linear(d_model, 13)
-
+        # self.output = nn.Linear(d_model, 13)
+        self.A_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 5)
+        )
+        self.B_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 5)
+        )
+        self.C_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 7)
+        )
+        self.D_decoder = nn.Sequential(
+            nn.Linear(d_model, 64),
+            nn.Tanh(),
+            nn.Linear(64, 13)
+        )
         # 初始化
         for p in self.parameters():
             if p.dim() > 1:
@@ -172,43 +214,76 @@ class MultiInputTransformer(nn.Module):
         craft:     [batch,  1]
         taskid:    [batch,  1]
         """
+        #维度增加
         input_vec = input_vec.unsqueeze(1)
         craft = craft.unsqueeze(1)
-        #taskid = taskid.unsqueeze(1)
-        # 投影
-        i = self.input_proj(input_vec)   # [batch, 1, d_model]
-        c = self.craft_proj(craft)       # [batch, 1, d_model]
-        #t = self.task_proj(taskid)       # [batch, 1, d_model]
-        t = self.task_embed(taskid.squeeze(-1).long()).unsqueeze(1)  # [batch, 1, d_model]
+        taskid = taskid.unsqueeze(1)
 
-        # 拼接成 seq_len = 3
-        x = torch.cat([i, c, t], dim=1)  # [batch, 3, d_model]
+        #转置
+        input_vec = input_vec.transpose(1, 2)
+        craft = craft.transpose(1, 2)
+        taskid = taskid.transpose(1, 2)
+
+        # 拼接
+        x = torch.cat([input_vec, craft, taskid], dim=1)  # [batch, 15, 1]
+        #tokenizer
+        y = self.mlp_embed(x)
 
         # 如果使用位置编码，则启用下面一行
         # x = self.pos_enc(x)
 
         # Encoder
-        memory = self.encoder(x, mask)   # [batch, 3, d_model]
+        memory = self.encoder(y, mask)   # [batch, 15, d_model]
+        pooled = memory.mean(dim=1)  # [batch, d_model]
 
         # 取第一个 token（对应 input）的表示作为输出
-        out_vec = self.output(memory[:, 0, :])  # [batch, 13]
-        return out_vec
+
+        out = torch.zeros(pooled.size(0), 13, device=pooled.device)
+        for i, tid in enumerate(taskid):
+            if tid.item() == 1:
+                pred = self.A_decoder(pooled[i])
+                out[i, :5] = pred  # 填充前5个
+            elif tid.item() == 2:
+                pred = self.B_decoder(pooled[i])
+                out[i, :5] = pred  # 填充前5个
+            elif tid.item() == 3:
+                pred = self.C_decoder(pooled[i])
+                out[i, :7] = pred  # 填充前5个
+            elif tid.item() == 4:
+                out[i] = self.D_decoder(pooled[i])
+            else:
+                raise ValueError(f"未知 taskid: {tid.item()}")
+        return out
 
 
 # ----------------------------- 测试脚本 -----------------------------
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    # ====== 实例化模型 ======
     model = MultiInputTransformer(d_model=128, N=3, d_ff=512, h=4, dropout=0.1).to(device)
     model.eval()
 
-    # batch 示例（batch=1）
+    # ====== 构造测试输入 ======
     batch = 4
-    input_vec = torch.randn(batch, 13, device=device)          # 实数特征
-    craft = torch.randn(batch, 1, device=device)               # 实数工艺参数
-    # taskid 用二进制表示，例如 '01' -> [0,1]
-    taskid = torch.tensor([[1], [2], [3], [4]])            # shape [1,1,2]
+    input_vec = torch.randn(batch, 13, device=device)   # 连续特征
+    craft = torch.randn(batch, 1, device=device)        # 工艺特征
 
-    out = model(input_vec, craft, taskid)
-    print("output shape:", out.shape)     # expected: [1, 13]
-    print("output:", out.detach().cpu().numpy())
+    # 不同样本的任务编号（1、2 走 group1；3、4 走 group2）
+    taskid = torch.tensor([[1], [2], [3], [4]], dtype=torch.long, device=device)
+
+    # ====== 前向推理 ======
+    with torch.no_grad():
+        out = model(input_vec, craft, taskid)
+
+    # ====== 输出检查 ======
+    print(f"Input shape : {input_vec.shape}")
+    print(f"Craft shape : {craft.shape}")
+    print(f"TaskID shape: {taskid.shape}")
+    print(f"Output shape: {out.shape}")
+    print("Output sample:")
+    print(out)
+
+
