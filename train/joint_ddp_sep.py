@@ -37,16 +37,16 @@ def Joint_train():
         print(eval_args)
         print("===================================================")
     (train_set_A,train_set_B,train_set_C,train_set_D,
-     test_set_A, test_set_B, test_set_C, test_set_D) = get_dataset_four_models(0.9)
+     test_set_A, test_set_B, test_set_C, test_set_D) = get_dataset_four_models(0.9,True)
     # ====== 训练集 ======
-    train_set = ConcatDataset([
-        train_set_A,
-        train_set_B,
-        train_set_C,
-        train_set_D
-    ])
-    sampler_train = DistributedSampler(train_set,shuffle=True)
-    train_loader = DataLoader(train_set, batch_size=train_args.train_bs, sampler=sampler_train)
+    sampler_train_A = DistributedSampler(train_set_A, shuffle=True)
+    sampler_train_B = DistributedSampler(train_set_B, shuffle=True)
+    sampler_train_C = DistributedSampler(train_set_C, shuffle=True)
+    sampler_train_D = DistributedSampler(train_set_D, shuffle=True)
+    train_dataloader_A = DataLoader(train_set_A, batch_size=train_args.train_bs, sampler=sampler_train_A)
+    train_dataloader_B = DataLoader(train_set_B, batch_size=train_args.train_bs, sampler=sampler_train_B)
+    train_dataloader_C = DataLoader(train_set_C, batch_size=train_args.train_bs, sampler=sampler_train_C)
+    train_dataloader_D = DataLoader(train_set_D, batch_size=train_args.train_bs, sampler=sampler_train_D)
 
     # ====== 测试集 ======
     sampler_test_A = DistributedSampler(test_set_A,shuffle=True)
@@ -83,7 +83,10 @@ def Joint_train():
     if(rank==0):
         print("=================Train Started=================")
     for epoch in tqdm(range(train_args.train_epochs), desc="Training Progress", ncols=100):
-        model_training(model, train_loader, optimizer, train_args,device)
+        model_training(model, train_dataloader_A, optimizer, train_args,device)
+        model_training(model, train_dataloader_B, optimizer, train_args, device)
+        model_training(model, train_dataloader_C, optimizer, train_args, device)
+        model_training(model, train_dataloader_D, optimizer, train_args, device)
 
         if (epoch + 1) % eval_args.eval_epochs_per_time == 0:
             if dist.get_rank() == 0:  # 只在主进程保存
@@ -112,6 +115,8 @@ def Joint_train():
             tqdm.write(f"Epoch {epoch+1}/{train_args.train_epochs} finished"
                    f"Time={(train_time - start_time) // 60}min{(train_time - start_time) % 60}s")
 
+    time.sleep(0.1)
     ddp_close_up()
+    time.sleep(0.1)
     if (rank == 0):
         print("=================Train Finished=================")

@@ -1,5 +1,5 @@
 import torch
-from utils.loss import forward_dynamic_loss,dynamic_weight_average
+from utils.loss import forward_loss,forward_dynamic_loss,dynamic_weight_average
 
 def model_training(model, loader, optimizer, train_args,device):
     model.train()
@@ -10,10 +10,11 @@ def model_training(model, loader, optimizer, train_args,device):
 
     for input, ground_truth,task_id,craft in loader:
         if(torch.cuda.is_available()):
-            input, ground_truth = input.to(device), ground_truth.to(device)
+            input, ground_truth,task_id,craft = input.to(device), ground_truth.to(device), task_id.to(device), craft.to(device)
         pred = model(input,craft, task_id)
 
         total_loss,losses = forward_dynamic_loss(pred, ground_truth,weights)
+        # total_loss,_,_=forward_loss(pred, ground_truth, train_args.train_MSE_ratio, train_args.train_MAE_ratio)
 
         optimizer.zero_grad()
         total_loss.backward()

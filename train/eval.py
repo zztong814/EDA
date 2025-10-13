@@ -17,10 +17,10 @@ def model_evaluate(model, loader_task_A, loader_task_B,loader_task_C,loader_task
     total_fom_D=model_evaluate_task(model, loader_task_D, epoch, eval_args.eval_output_dir_D,task="D",device=device)
 
     print(f"Eval Done: "
-          f"FoM_A = {total_fom_A:.6f},"
-          f"FoM_B = {total_fom_B:.6f},"
-          f"FoM_C = {total_fom_C:.6f},"
-          f"FoM_D = {total_fom_D:.6f}")
+          f"MSE_A = {total_fom_A:.6f},"
+          f"MSE_B = {total_fom_B:.6f},"
+          f"MSE_C = {total_fom_C:.6f},"
+          f"MSE_D = {total_fom_D:.6f}")
 
 def model_evaluate_task(model, loader, epoch , save_dir,task="A",device='cpu'):
     model.eval()
@@ -28,7 +28,7 @@ def model_evaluate_task(model, loader, epoch , save_dir,task="A",device='cpu'):
 
     with torch.no_grad():
         for inputs, ground_truth,task_id,craft in loader:
-            inputs, ground_truth = inputs.to(device), ground_truth.to(device)
+            inputs, ground_truth,task_id,craft = inputs.to(device), ground_truth.to(device), task_id.to(device), craft.to(device)
             preds = model(inputs, craft, task_id)
 
             all_preds.append(preds.cpu())
@@ -71,7 +71,8 @@ def model_evaluate_task(model, loader, epoch , save_dir,task="A",device='cpu'):
             fom = 0.5 * mse + 0.5 * mae
             results.append([mse, mae, fom])
 
-        total_fom += fom
+        total_fom += mse
+    total_fom=total_fom/n_targets
 
     # 保存到 Excel
     save_path=f"{save_dir}/{epoch}.csv"
