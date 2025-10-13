@@ -23,14 +23,14 @@ class ModelArgs:
 
 @dataclass
 class TrainArgs:
-    train_bs:            int = 32
+    train_bs:            int = 64
     train_epochs:       int = 100
     train_lr:           float = 1e-3
     train_lr_min:       float = 1e-5
     train_weight_decay: float = 1e-2
     train_weight_B:     int = 1
-    train_MSE_ratio:     float = 0.5
-    train_MAE_ratio:    float = 0.5
+    train_MSE_ratio:     float = 1.0
+    train_MAE_ratio:    float = 0.0
     train_R2_ratio:     float = 0.0
     train_per_save_epochs: int = 10
     train_DWA_num:       int = 13
@@ -39,7 +39,7 @@ class TrainArgs:
 
 @dataclass
 class EvalArgs:
-    eval_bs:         int = 32
+    eval_bs:         int = 64
     eval_epochs_per_time: int=1
     eval_output_dir_A: str = 'output/eval/A'
     eval_output_dir_B: str = 'output/eval/B'

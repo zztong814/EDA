@@ -15,8 +15,8 @@ def forward_loss(outputs, targets , MSE_ratio , MAE_ratio ):
         tgt_i = targets[:, i]
 
         # --- MSE & MAE ---
-        mse = nn.MSELoss(reduction='sum')(out_i, tgt_i)
-        mae = nn.L1Loss(reduction='sum')(out_i, tgt_i)
+        mse = nn.MSELoss()(out_i, tgt_i)
+        mae = nn.L1Loss()(out_i, tgt_i)
 
         loss_i = MSE_ratio*mse + MAE_ratio*mae
 
@@ -24,7 +24,10 @@ def forward_loss(outputs, targets , MSE_ratio , MAE_ratio ):
         mse_total += mse
         mae_total += mae
 
-    return loss_total, mse_total / dim, mae_total / dim
+    loss_total = loss_total/dim
+    mse_total = mse_total/dim
+    mae_total = mae_total/dim
+    return loss_total,mse_total,mae_total
 
 def forward_dynamic_loss(outputs, targets , weights):
     """
