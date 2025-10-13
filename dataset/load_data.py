@@ -67,9 +67,9 @@ def pad_to_13(df):
 def min_max_normalization(df):
     for col in df.columns:
         if (df[col].min() == df[col].max()):
-            df[col] = 1
+            df[col] = 100
         else:
-            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
+            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())*100
 
 def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     A = A_input_df.copy()
@@ -204,14 +204,14 @@ def get_dataset(file_paths, target_technology_ratio, normalize):
     return train_dataset, A_test_dataset, B_test_dataset, C_test_dataset, D_test_dataset
 
 def get_dataset_four_models(target_technology_ratio, normalize):
-    p1 = '01_train_set/5t_opamp/source/pretrain_design_features.csv'
-    p2 = '01_train_set/5t_opamp/source/pretrain_targets.csv'
-    p3 = '01_train_set/5t_opamp/target/target_design_features.csv'
-    p4 = '01_train_set/5t_opamp/target/target_targets.csv'
-    p5 = '01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
-    p6 = '01_train_set/two_stage_opamp/source/pretrain_targets.csv'
-    p7 = '01_train_set/two_stage_opamp/target/target_design_features.csv'
-    p8 = '01_train_set/two_stage_opamp/target/target_targets.csv'
+    p1 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
+    p2 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
+    p3 = 'dataset/dataset/01_train_set/5t_opamp/target/target_design_features.csv'
+    p4 = 'dataset/dataset/01_train_set/5t_opamp/target/target_targets.csv'
+    p5 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
+    p6 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
+    p7 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
+    p8 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
     path_list = [p1, p2, p3, p4, p5, p6, p7, p8]
     (A_train_input_df, B_train_input_df, C_train_input_df, D_train_input_df, 
      A_train_output_df, B_train_output_df, C_train_output_df, D_train_output_df, 
@@ -247,6 +247,10 @@ def get_dataset_default(target_technology_ratio, normalize):
 # 测试代码，用前可以参考一下
 if __name__ == "__main__":
     train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D = get_dataset_four_models(0.8, True)
-    for input, output, task_id, technology_type in DataLoader(test_set_C):
-        print(input, '\n', output, '\n', task_id, '\n', technology_type)
-        print('————————————————————————————')
+    print(train_set_A[0])
+    print(train_set_B[0])
+    print(train_set_C[0])
+    print(train_set_D[0])
+    # for input, output, task_id, technology_type in DataLoader(test_set_C):
+    #     print(input, '\n', output, '\n', task_id, '\n', technology_type)
+    #     print('————————————————————————————')
