@@ -1,0 +1,15 @@
+python ./demo1.py\
+ --model_d_model 128\
+ --model_encoder_layers 10\
+ --model_d_ff 512\
+ --model_heads 4\
+ --train_bs 64\
+ --train_epochs 100\
+ --train_lr 1e-3\
+ --train_lr_min 1e-5\
+ --eval_bs 64\
+ --eval_epochs_per_time 1\
+ --eval_output_dir_A 'output/eval/A'\
+ --eval_output_dir_B 'output/eval/B'\
+ --eval_output_dir_C 'output/eval/C'\
+ --eval_output_dir_D 'output/eval/D'
