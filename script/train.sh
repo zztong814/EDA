@@ -1,6 +1,6 @@
 python ./demo1.py\
  --model_d_model 128\
- --model_encoder_layers 10\
+ --model_encoder_layers 2\
  --model_d_ff 512\
  --model_heads 4\
  --train_bs 64\
