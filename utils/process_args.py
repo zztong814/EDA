@@ -16,7 +16,7 @@ import transformers
 @dataclass
 class ModelArgs:
     model_d_model:           int = 128
-    model_encoder_layers:    int=4
+    model_encoder_layers:    int=10
     model_d_ff:              int=512
     model_heads:             int=4
     model_dropout:           float=0.1
@@ -35,7 +35,11 @@ class TrainArgs:
     train_per_save_epochs: int = 10
     train_DWA_num:       int = 13
     train_DWA_T:            float = 2.0
+    train_pretrain_pth: str = 'output/pretrained.pth'
+    train_finetune_pth: str = 'output/finetune.pth'
     local_rank: int = field(default=0, metadata={"help": "For distributed training: local_rank"})
+    train_pretrain_epochs: int = 100
+    train_finetune_epochs: int = 50
 
 @dataclass
 class EvalArgs:
