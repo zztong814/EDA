@@ -7,9 +7,10 @@ from tqdm import tqdm
 from torch.utils.data.distributed import DistributedSampler
 import time
 
-from dataset.load_data import get_dataset_default,get_dataset_four_models
+from dataset.load_data import get_dataset_four_models
 from utils.process_args import process_args
 from model.transformer2 import MultiInputTransformer
+from model.mlp1 import Regressor
 from train.train import model_training
 from train.eval import model_evaluate
 
@@ -41,12 +42,13 @@ def Joint_train():
 
 
     # ====== 模型 ======
-    model = MultiInputTransformer(d_model=model_args.model_d_model,
-                                  N=model_args.model_encoder_layers,
-                                  d_ff=model_args.model_d_ff,
-                                  h=model_args.model_heads,
-                                  dropout=model_args.model_dropout)
+    # model = MultiInputTransformer(d_model=model_args.model_d_model,
+    #                               N=model_args.model_encoder_layers,
+    #                               d_ff=model_args.model_d_ff,
+    #                               h=model_args.model_heads,
+    #                               dropout=model_args.model_dropout)
 
+    model = Regressor()
     print("===================================================")
     print(model)
     print("===================================================")
@@ -55,7 +57,7 @@ def Joint_train():
 
     # ====== 优化器 ======
     optimizer = torch.optim.AdamW(model.parameters(), lr=train_args.train_lr, weight_decay=train_args.train_weight_decay)
-    scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_args.train_epochs, eta_min=train_args.train_lr_min,verbose=True)
+    scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_args.train_epochs, eta_min=train_args.train_lr_min)
 
     # ====== 主流程 ======
     start_time = time.time()
@@ -88,8 +90,6 @@ def Joint_train():
 
         train_time = time.time()
 
-        tqdm.write(f"Epoch {epoch+1}/{train_args.train_epochs} finished"
-               f"Time={(train_time - start_time) // 60}min{(train_time - start_time) % 60}s")
 
     time.sleep(0.1)
     print("=================Train Finished=================")
