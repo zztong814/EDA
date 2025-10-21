@@ -36,8 +36,7 @@ def model_training(model, loader, optimizer, train_args,device):
         total_mse+=mse_total
         total_mae+=mae_total
         # weights, loss_history = dynamic_weight_average(losses, loss_history, T=train_args.train_DWA_T)
-    print(total_mse)
-    print(total_loss_all)
+    print(total_loss_all,total_mse,total_mae)
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,14 +49,12 @@ def main():
     print("===================================================")
 
     (train_set_A, train_set_B, train_set_C, train_set_D,
-         test_set_A, test_set_B, test_set_C, test_set_D) =get_dataset_seperate(train_data_ratio=0.1, normalize=True, is_pretrain=True)
-    (_, _, _, _,
      test_set_A, test_set_B, test_set_C, test_set_D) = get_dataset_seperate(train_data_ratio=0.9, normalize=True,is_pretrain=True)
     # ====== 训练集 ======
     train_set = ConcatDataset([
         # train_set_A,
         train_set_B
-        # train_set_C
+        # train_set_C,
         # train_set_D
     ])
     train_loader = DataLoader(train_set, batch_size=train_args.train_bs, shuffle=True)
@@ -100,7 +97,7 @@ def main():
 
     start_time = time.time()
     print("=================Pretrain Started=================")
-    for epoch in tqdm(range(train_args.train_pretrain_epochs), desc="Training Progress", ncols=100):
+    for epoch in tqdm(range(train_args.train_pretrain_epochs), desc="Training Progress", ncols=100,disable=True):
         model_training(model, train_loader, optimizer, train_args, device)
 
         if (epoch + 1) % eval_args.eval_epochs_per_time == 0:
