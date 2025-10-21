@@ -24,7 +24,7 @@ class ModelArgs:
 @dataclass
 class TrainArgs:
     train_bs:            int = 64
-    train_epochs:       int = 100
+    train_epochs:       int = 200
     train_lr:           float = 1e-3
     train_lr_min:       float = 1e-5
     train_weight_decay: float = 1e-2
@@ -38,7 +38,7 @@ class TrainArgs:
     train_pretrain_pth: str = 'output/pretrained.pth'
     train_finetune_pth: str = 'output/finetune.pth'
     local_rank: int = field(default=0, metadata={"help": "For distributed training: local_rank"})
-    train_pretrain_epochs: int = 100
+    train_pretrain_epochs: int = 200
     train_finetune_epochs: int = 50
 
 @dataclass
