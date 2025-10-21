@@ -333,6 +333,10 @@ def get_val_dataset():
     input_B_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_B.csv')
     input_C_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_C.csv')
     input_D_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_D.csv')
+    pad_to_13(input_A_df)
+    pad_to_13(input_B_df)
+    pad_to_13(input_C_df)
+    pad_to_13(input_D_df)
     # task_id
     task_id_A = pd.DataFrame({'task_id': [0] * (len(input_A_df))})
     task_id_B = pd.DataFrame({'task_id': [1] * (len(input_B_df))})
