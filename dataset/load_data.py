@@ -58,7 +58,7 @@ def min_max_normalization(df):
         if (df[col].min() == df[col].max()):
             df[col] = 100
         else:
-            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())*100
+            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min()) * 100
 
 def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     A = A_input_df.copy()
@@ -329,14 +329,18 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
                             
     
 def get_val_dataset():
-    input_A_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_A.csv')
-    input_B_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_B.csv')
-    input_C_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_C.csv')
-    input_D_df = source_features_5t_df = pd.read_csv('dataset/02_public_test_set/features/features_D.csv')
+    input_A_df = pd.read_csv('dataset/02_public_test_set/features/features_A.csv')
+    input_B_df = pd.read_csv('dataset/02_public_test_set/features/features_B.csv')
+    input_C_df = pd.read_csv('dataset/02_public_test_set/features/features_C.csv')
+    input_D_df = pd.read_csv('dataset/02_public_test_set/features/features_D.csv')
     pad_to_13(input_A_df)
     pad_to_13(input_B_df)
     pad_to_13(input_C_df)
     pad_to_13(input_D_df)
+    min_max_normalization(input_A_df)
+    min_max_normalization(input_B_df)
+    min_max_normalization(input_C_df)
+    min_max_normalization(input_D_df)
     # task_id
     task_id_A = pd.DataFrame({'task_id': [0] * (len(input_A_df))})
     task_id_B = pd.DataFrame({'task_id': [1] * (len(input_B_df))})
@@ -356,7 +360,6 @@ def get_val_dataset():
     return val_set_A, val_set_B, val_set_C, val_set_D
 
     
-
 
 # 测试代码，用前可以参考一下
 if __name__ == "__main__":
