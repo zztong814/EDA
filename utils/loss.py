@@ -43,11 +43,11 @@ def forward_dynamic_loss(outputs, targets , weights):
 
         # --- MSE & MAE ---
         mse = nn.MSELoss(reduction='mean')(out_i, tgt_i)
-        mae = nn.L1Loss(reduction='mean')(out_i, tgt_i)
+        # mae = nn.L1Loss(reduction='mean')(out_i, tgt_i)
         mse_list.append(mse)
-        mae_list.append(mae)
-
-    losses = mse_list + mae_list  # 26 个 loss
+        # mae_list.append(mae)
+    losses = mse_list               # 13 个 loss
+    # losses = mse_list + mae_list  # 26 个 loss
 
     total_loss = sum(w * l for w, l in zip(weights, losses))
 
