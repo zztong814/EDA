@@ -156,10 +156,10 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     D_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_train_input_df))})
     D_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_test_input_df))})
     # technology_type
-    A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_5t_df) + [2] * A_k})
-    A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_5t_df) - A_k)})
-    B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_two_stage_df) + [2] * B_k})
-    B_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_two_stage_df) - B_k)})
+    A_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(source_features_5t_df) + [2] * A_k})
+    A_test_technology_type_df = pd.DataFrame({'technology_type': [1] * (len(target_features_5t_df) - A_k)})
+    B_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(source_features_two_stage_df) + [2] * B_k})
+    B_test_technology_type_df = pd.DataFrame({'technology_type': [1] * (len(target_features_two_stage_df) - B_k)})
     C_train_technology_type_df = A_train_technology_type_df
     C_test_technology_type_df = A_test_technology_type_df
     D_train_technology_type_df = B_train_technology_type_df
@@ -266,10 +266,10 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
         D_train_output_df = B_train_input_df
         D_test_output_df = B_test_input_df
         # technology_type
-        A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_train_input_df)})
-        A_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_test_input_df)})
-        B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_train_input_df)})
-        B_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_test_input_df)})
+        A_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(A_train_input_df)})
+        A_test_technology_type_df = pd.DataFrame({'technology_type': [0] * len(A_test_input_df)})
+        B_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(B_train_input_df)})
+        B_test_technology_type_df = pd.DataFrame({'technology_type': [0] * len(B_test_input_df)})
         C_train_technology_type_df = A_train_technology_type_df
         C_test_technology_type_df = A_test_technology_type_df
         D_train_technology_type_df = B_train_technology_type_df
@@ -298,10 +298,10 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
         D_train_output_df = B_train_input_df
         D_test_output_df = B_test_input_df
         # technology_type
-        A_train_technology_type_df = pd.DataFrame({'technology_type': [2] * len(A_train_input_df)})
-        A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * len(A_test_input_df)})
-        B_train_technology_type_df = pd.DataFrame({'technology_type': [2] * len(B_train_input_df)})
-        B_test_technology_type_df = pd.DataFrame({'technology_type': [2] * len(B_test_input_df)})
+        A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_train_input_df)})
+        A_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_test_input_df)})
+        B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_train_input_df)})
+        B_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_test_input_df)})
         C_train_technology_type_df = A_train_technology_type_df
         C_test_technology_type_df = A_test_technology_type_df
         D_train_technology_type_df = B_train_technology_type_df
@@ -339,10 +339,10 @@ def get_val_dataset():
     task_id_C = pd.DataFrame({'task_id': [2] * (len(input_C_df))})
     task_id_D = pd.DataFrame({'task_id': [3] * (len(input_D_df))})
     # technology_type
-    technology_type_A = pd.DataFrame({'technology_type': [2] * (len(input_A_df))})
-    technology_type_B = pd.DataFrame({'technology_type': [2] * (len(input_B_df))})
-    technology_type_C = pd.DataFrame({'technology_type': [2] * (len(input_C_df))})
-    technology_type_D = pd.DataFrame({'technology_type': [2] * (len(input_D_df))})
+    technology_type_A = pd.DataFrame({'technology_type': [1] * (len(input_A_df))})
+    technology_type_B = pd.DataFrame({'technology_type': [1] * (len(input_B_df))})
+    technology_type_C = pd.DataFrame({'technology_type': [1] * (len(input_C_df))})
+    technology_type_D = pd.DataFrame({'technology_type': [1] * (len(input_D_df))})
 
     val_set_A = OpampDataset(input = input_A_df, task_id = task_id_A, technology_type = technology_type_A)
     val_set_B = OpampDataset(input = input_B_df, task_id = task_id_B, technology_type = technology_type_B)
