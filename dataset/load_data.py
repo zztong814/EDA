@@ -78,14 +78,14 @@ def get_file_paths():
     """
     咱俩文件路径不一样，之后直接在这个文件里面修改容易点
     """
-    p1 = 'dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
-    p2 = 'dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
-    p3 = 'dataset/01_train_set/5t_opamp/target/target_design_features.csv'
-    p4 = 'dataset/01_train_set/5t_opamp/target/target_targets.csv'
-    p5 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
-    p6 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
-    p7 = 'dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
-    p8 = 'dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
+    p1 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
+    p2 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
+    p3 = 'dataset/dataset/01_train_set/5t_opamp/target/target_design_features.csv'
+    p4 = 'dataset/dataset/01_train_set/5t_opamp/target/target_targets.csv'
+    p5 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
+    p6 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
+    p7 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
+    p8 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
     path_list = [p1, p2, p3, p4, p5, p6, p7, p8]
     return path_list
 
@@ -147,14 +147,14 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     D_train_output_df = B_train_input_df
     D_test_output_df = B_test_input_df
     # task_id
-    A_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_train_input_df))})
-    A_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_test_input_df))})
-    B_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_train_input_df))})
-    B_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_test_input_df))})
-    C_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_train_input_df))})
-    C_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_test_input_df))})
-    D_train_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_train_input_df))})
-    D_test_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_test_input_df))})
+    A_train_task_id_df = pd.DataFrame({'task_id': [0] * (len(A_train_input_df))})
+    A_test_task_id_df = pd.DataFrame({'task_id': [0] * (len(A_test_input_df))})
+    B_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(B_train_input_df))})
+    B_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(B_test_input_df))})
+    C_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(C_train_input_df))})
+    C_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(C_test_input_df))})
+    D_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_train_input_df))})
+    D_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_test_input_df))})
     # technology_type
     A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(source_features_5t_df) + [2] * A_k})
     A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * (len(target_features_5t_df) - A_k)})
@@ -266,10 +266,10 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
         D_train_output_df = B_train_input_df
         D_test_output_df = B_test_input_df
         # technology_type
-        A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_train_input_df)})
-        A_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_test_input_df)})
-        B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_train_input_df)})
-        B_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_test_input_df)})
+        A_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(A_train_input_df)})
+        A_test_technology_type_df = pd.DataFrame({'technology_type': [0] * len(A_test_input_df)})
+        B_train_technology_type_df = pd.DataFrame({'technology_type': [0] * len(B_train_input_df)})
+        B_test_technology_type_df = pd.DataFrame({'technology_type': [0] * len(B_test_input_df)})
         C_train_technology_type_df = A_train_technology_type_df
         C_test_technology_type_df = A_test_technology_type_df
         D_train_technology_type_df = B_train_technology_type_df
@@ -298,24 +298,24 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
         D_train_output_df = B_train_input_df
         D_test_output_df = B_test_input_df
         # technology_type
-        A_train_technology_type_df = pd.DataFrame({'technology_type': [2] * len(A_train_input_df)})
-        A_test_technology_type_df = pd.DataFrame({'technology_type': [2] * len(A_test_input_df)})
-        B_train_technology_type_df = pd.DataFrame({'technology_type': [2] * len(B_train_input_df)})
-        B_test_technology_type_df = pd.DataFrame({'technology_type': [2] * len(B_test_input_df)})
+        A_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_train_input_df)})
+        A_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(A_test_input_df)})
+        B_train_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_train_input_df)})
+        B_test_technology_type_df = pd.DataFrame({'technology_type': [1] * len(B_test_input_df)})
         C_train_technology_type_df = A_train_technology_type_df
         C_test_technology_type_df = A_test_technology_type_df
         D_train_technology_type_df = B_train_technology_type_df
         D_test_technology_type_df = B_test_technology_type_df
 
     # task_id
-    A_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_train_input_df))})
-    A_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(A_test_input_df))})
-    B_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_train_input_df))})
-    B_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(B_test_input_df))})
-    C_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_train_input_df))})
-    C_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(C_test_input_df))})
-    D_train_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_train_input_df))})
-    D_test_task_id_df = pd.DataFrame({'task_id': [4] * (len(D_test_input_df))})
+    A_train_task_id_df = pd.DataFrame({'task_id': [0] * (len(A_train_input_df))})
+    A_test_task_id_df = pd.DataFrame({'task_id': [0] * (len(A_test_input_df))})
+    B_train_task_id_df = pd.DataFrame({'task_id': [1] * (len(B_train_input_df))})
+    B_test_task_id_df = pd.DataFrame({'task_id': [1] * (len(B_test_input_df))})
+    C_train_task_id_df = pd.DataFrame({'task_id': [2] * (len(C_train_input_df))})
+    C_test_task_id_df = pd.DataFrame({'task_id': [2] * (len(C_test_input_df))})
+    D_train_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_train_input_df))})
+    D_test_task_id_df = pd.DataFrame({'task_id': [3] * (len(D_test_input_df))})
         
     train_set_A = OpampDataset(input = A_train_input_df, output = A_train_output_df, task_id = A_train_task_id_df, technology_type = A_train_technology_type_df)
     train_set_B = OpampDataset(input = B_train_input_df, output = B_train_output_df, task_id = B_train_task_id_df, technology_type = B_train_technology_type_df)
