@@ -84,7 +84,7 @@ def min_max_norm_cross(df_list):
     # source_targets_two_stage_df
     df_list[5].loc[:,'slewrate_pos'] = 100 * (df_list[5].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
     df_list[5].loc[:,'dc_gain'] = 100 * (df_list[5].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
-    df_list[5].loc[:,'ugf'] = 100 * (df_list[5].loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    df_list[5].loc[:,'ugf'] = 100 * (df_list[5].loc[:,'ugf'] - 3791.34972457912) / (100000000000 - 3791.34972457912)
     df_list[5].loc[:,'phase_margin'] = 100 * (df_list[5].loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
     df_list[5].loc[:,'cmrr'] = 100 * (df_list[5].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
     # target_features_two_stage_df
@@ -96,7 +96,7 @@ def min_max_norm_cross(df_list):
     # target_targets_two_stage_df
     df_list[7].loc[:,'slewrate_pos'] = 100 * (df_list[7].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
     df_list[7].loc[:,'dc_gain'] = 100 * (df_list[7].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
-    df_list[7].loc[:,'ugf'] = 100 * (df_list[7].loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    df_list[7].loc[:,'ugf'] = 100 * (df_list[7].loc[:,'ugf'] - 3791.34972457912) / (100000000000 - 3791.34972457912)
     df_list[7].loc[:,'phase_margin'] = 100 * (df_list[7].loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
     df_list[7].loc[:,'cmrr'] = 100 * (df_list[7].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
 
