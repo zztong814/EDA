@@ -391,12 +391,12 @@ def get_val_dataset(csv_path_A, csv_path_B, csv_path_C, csv_path_D):
     input_B_df.loc[:,'ibias'] = 100
     input_C_df.loc[:,'slewrate_pos'] = 100 * (input_C_df.loc[:,'slewrate_pos'] - 645632.611780252) / (10602059.8211294 - 645632.611780252)
     input_C_df.loc[:,'dc_gain'] = 100 * (input_C_df.loc[:,'dc_gain'] - 0.020728808400004) / (292.707702161998 - 0.020728808400004)
-    input_C_df.loc[:,'ugf'] = 100 * (input_C_df.loc[:,'ugf'] - 1221065.9825421) / (100000000000 - 1221065.9825421)
+    input_C_df.loc[:,'ugf'] = 100 * (input_C_df.loc[:,'ugf'] - 1221065.9825421) / (1e11 - 1221065.9825421)
     input_C_df.loc[:,'phase_margin'] = 100 * (input_C_df.loc[:,'phase_margin'] + 12.2475159224187) / (149.258357674875 + 12.2475159224187)
     input_C_df.loc[:,'cmrr'] = 100 * (input_C_df.loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
     input_D_df.loc[:,'slewrate_pos'] = 100 * (input_D_df.loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
     input_D_df.loc[:,'dc_gain'] = 100 * (input_D_df.loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
-    input_D_df.loc[:,'ugf'] = 100 * (input_D_df.loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    input_D_df.loc[:,'ugf'] = 100 * (input_D_df.loc[:,'ugf'] - 3791.34972457912) / (1e11 - 3791.34972457912)
     input_D_df.loc[:,'phase_margin'] = 100 * (input_D_df.loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
     input_D_df.loc[:,'cmrr'] = 100 * (input_D_df.loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
     # pad to 13 columns
