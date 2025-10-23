@@ -77,10 +77,10 @@ def min_max_norm_cross(df_list):
     df_list[3].loc[:,'cmrr'] = 100 * (df_list[3].loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
     # source_features_two_stage_df
     df_list[4].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[4].loc[:,['w1','w2','w3','w4','w5']] - 1) / (50 - 1)
-    df_list[4].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[4].loc[:,['l1','l2','l3','l4','l5']] - 1) / (2 - 1)
+    df_list[4].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[4].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
     df_list[4].loc[:,'cc'] = 100 * (df_list[4].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     df_list[4].loc[:,'cr'] = 100 * (df_list[4].loc[:,'cr'] - 500) / (100000 - 500) 
-    df_list[4].loc[:,'ibias'] = 100 * df_list[4].loc[:,'ibias']
+    df_list[4].loc[:,'ibias'] = 100
     # source_targets_two_stage_df
     df_list[5].loc[:,'slewrate_pos'] = 100 * (df_list[5].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
     df_list[5].loc[:,'dc_gain'] = 100 * (df_list[5].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
@@ -89,10 +89,10 @@ def min_max_norm_cross(df_list):
     df_list[5].loc[:,'cmrr'] = 100 * (df_list[5].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
     # target_features_two_stage_df
     df_list[6].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[6].loc[:,['w1','w2','w3','w4','w5']] - 1) / (50 - 1)
-    df_list[6].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[6].loc[:,['l1','l2','l3','l4','l5']] - 1) / (2 - 1)
+    df_list[6].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[6].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
     df_list[6].loc[:,'cc'] = 100 * (df_list[6].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     df_list[6].loc[:,'cr'] = 100 * (df_list[6].loc[:,'cr'] - 500) / (100000 - 500) 
-    df_list[6].loc[:,'ibias'] = 100 * df_list[6].loc[:,'ibias']
+    df_list[6].loc[:,'ibias'] = 100
     # target_targets_two_stage_df
     df_list[7].loc[:,'slewrate_pos'] = 100 * (df_list[7].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
     df_list[7].loc[:,'dc_gain'] = 100 * (df_list[7].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
@@ -379,7 +379,7 @@ def get_val_dataset(csv_path_A, csv_path_B, csv_path_C, csv_path_D):
     input_A_df = pd.read_csv(csv_path_A)
     input_B_df = pd.read_csv(csv_path_B)
     input_C_df = pd.read_csv(csv_path_C)
-    input_D_df = pd.read_csv(csv_path_D)
+    input_D_df = pd.read_csv( csv_path_D)
     # normalization
     input_A_df.loc[:,['w1','w2','w3']] = 100 * (input_A_df.loc[:,['w1','w2','w3']] - 0.5) / (50 - 0.5)
     input_A_df.loc[:,['l1','l2','l3']] = 100 * (input_A_df.loc[:,['l1','l2','l3']] - 0.5) / (2 - 0.5)
@@ -388,7 +388,7 @@ def get_val_dataset(csv_path_A, csv_path_B, csv_path_C, csv_path_D):
     input_B_df.loc[:,['l1','l2','l3','l4','l5']] = 100 * (input_B_df.loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
     input_B_df.loc[:,'cc'] = 100 * (input_B_df.loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     input_B_df.loc[:,'cr'] = 100 * (input_B_df.loc[:,'cr'] - 500) / (100000 - 500) 
-    input_B_df.loc[:,'ibias'] = 100 * input_B_df.loc[:,'ibias']
+    input_B_df.loc[:,'ibias'] = 100
     input_C_df.loc[:,'slewrate_pos'] = 100 * (input_C_df.loc[:,'slewrate_pos'] - 645632.611780252) / (10602059.8211294 - 645632.611780252)
     input_C_df.loc[:,'dc_gain'] = 100 * (input_C_df.loc[:,'dc_gain'] - 0.020728808400004) / (292.707702161998 - 0.020728808400004)
     input_C_df.loc[:,'ugf'] = 100 * (input_C_df.loc[:,'ugf'] - 1221065.9825421) / (100000000000 - 1221065.9825421)
@@ -426,7 +426,7 @@ def get_val_dataset(csv_path_A, csv_path_B, csv_path_C, csv_path_D):
 
 # 测试代码，用前可以参考一下
 if __name__ == "__main__":
-    val_set_A, val_set_B, val_set_C, val_set_D = get_val_dataset()
+    val_set_A, val_set_B, val_set_C, val_set_D = get_val_dataset('dataset/02_public_test_set/features/features_A.csv', 'dataset/02_public_test_set/features/features_B.csv', 'dataset/02_public_test_set/features/features_C.csv', 'dataset/02_public_test_set/features/features_D.csv')
     print(val_set_A[0])
     print(val_set_B[0])
     print(val_set_C[0])
