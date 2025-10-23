@@ -76,8 +76,8 @@ def min_max_norm_cross(df_list):
     df_list[3].loc[:,'phase_margin'] = 100 * (df_list[3].loc[:,'phase_margin'] + 12.2475159224187) / (149.258357674875 + 12.2475159224187)
     df_list[3].loc[:,'cmrr'] = 100 * (df_list[3].loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
     # source_features_two_stage_df
-    df_list[4].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[4].loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
-    df_list[4].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[4].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
+    df_list[4].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[4].loc[:,['w1','w2','w3','w4','w5']] - 1) / (50 - 1)
+    df_list[4].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[4].loc[:,['l1','l2','l3','l4','l5']] - 1) / (2 - 1)
     df_list[4].loc[:,'cc'] = 100 * (df_list[4].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     df_list[4].loc[:,'cr'] = 100 * (df_list[4].loc[:,'cr'] - 500) / (100000 - 500) 
     df_list[4].loc[:,'ibias'] = 100 * df_list[4].loc[:,'ibias']
@@ -88,8 +88,8 @@ def min_max_norm_cross(df_list):
     df_list[5].loc[:,'phase_margin'] = 100 * (df_list[5].loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
     df_list[5].loc[:,'cmrr'] = 100 * (df_list[5].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
     # target_features_two_stage_df
-    df_list[6].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[6].loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
-    df_list[6].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[6].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
+    df_list[6].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[6].loc[:,['w1','w2','w3','w4','w5']] - 1) / (50 - 1)
+    df_list[6].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[6].loc[:,['l1','l2','l3','l4','l5']] - 1) / (2 - 1)
     df_list[6].loc[:,'cc'] = 100 * (df_list[6].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     df_list[6].loc[:,'cr'] = 100 * (df_list[6].loc[:,'cr'] - 500) / (100000 - 500) 
     df_list[6].loc[:,'ibias'] = 100 * df_list[6].loc[:,'ibias']
@@ -375,16 +375,16 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
     return train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D
 
 
-def get_val_dataset():
-    input_A_df = pd.read_csv('dataset/02_public_test_set/features/features_A.csv')
-    input_B_df = pd.read_csv('dataset/02_public_test_set/features/features_B.csv')
-    input_C_df = pd.read_csv('dataset/02_public_test_set/features/features_C.csv')
-    input_D_df = pd.read_csv('dataset/02_public_test_set/features/features_D.csv')
+def get_val_dataset(csv_path_A, csv_path_B, csv_path_C, csv_path_D):
+    input_A_df = pd.read_csv(csv_path_A)
+    input_B_df = pd.read_csv(csv_path_B)
+    input_C_df = pd.read_csv(csv_path_C)
+    input_D_df = pd.read_csv(csv_path_D)
     # normalization
     input_A_df.loc[:,['w1','w2','w3']] = 100 * (input_A_df.loc[:,['w1','w2','w3']] - 0.5) / (50 - 0.5)
     input_A_df.loc[:,['l1','l2','l3']] = 100 * (input_A_df.loc[:,['l1','l2','l3']] - 0.5) / (2 - 0.5)
     input_A_df.loc[:,'ibias'] = 100 * (input_A_df.loc[:,'ibias'] - 0.000005) / (0.00002 - 0.000005)
-    input_B_df.loc[:,['w1','w2','w3','w4','w5']] = 100 * (input_B_df.loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
+    input_B_df.loc[:,['w1','w2','w3','w4','w5']] = 100 * (input_B_df.loc[:,['w1','w2','w3','w4','w5']] - 1) / (50 - 1)
     input_B_df.loc[:,['l1','l2','l3','l4','l5']] = 100 * (input_B_df.loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
     input_B_df.loc[:,'cc'] = 100 * (input_B_df.loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
     input_B_df.loc[:,'cr'] = 100 * (input_B_df.loc[:,'cr'] - 500) / (100000 - 500) 
