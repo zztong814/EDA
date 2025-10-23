@@ -53,12 +53,52 @@ def pad_to_13(df):
     for i in range(df.shape[1], 13):
         df[i] = 0
 
-def min_max_normalization(df):
-    for col in df.columns:
-        if (df[col].min() == df[col].max()):
-            df[col] = 100
-        else:
-            df[col] = (df[col] - df[col].min()) / (df[col].max() - df[col].min()) * 100
+def min_max_norm_cross(df_list):
+    """进行跨工艺归一化"""
+    # source_features_5t_df
+    df_list[0].loc[:,['w1','w2','w3']] = 100 * (df_list[0].loc[:,['w1','w2','w3']] - 0.5) / (50 - 0.5)
+    df_list[0].loc[:,['l1','l2','l3']] = 100 * (df_list[0].loc[:,['l1','l2','l3']] - 0.5) / (2 - 0.5)
+    df_list[0].loc[:,'ibias'] = 100 * (df_list[0].loc[:,'ibias'] - 0.000005) / (0.00002 - 0.000005)
+    # source_targets_5t_df
+    df_list[1].loc[:,'slewrate_pos'] = 100 * (df_list[1].loc[:,'slewrate_pos'] - 645632.611780252) / (10602059.8211294 - 645632.611780252)
+    df_list[1].loc[:,'dc_gain'] = 100 * (df_list[1].loc[:,'dc_gain'] - 0.020728808400004) / (292.707702161998 - 0.020728808400004)
+    df_list[1].loc[:,'ugf'] = 100 * (df_list[1].loc[:,'ugf'] - 1221065.9825421) / (100000000000 - 1221065.9825421)
+    df_list[1].loc[:,'phase_margin'] = 100 * (df_list[1].loc[:,'phase_margin'] + 12.2475159224187) / (149.258357674875 + 12.2475159224187)
+    df_list[1].loc[:,'cmrr'] = 100 * (df_list[1].loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
+    # target_features_5t_df
+    df_list[2].loc[:,['w1','w2','w3']] = 100 * (df_list[2].loc[:,['w1','w2','w3']] - 0.5) / (50 - 0.5)
+    df_list[2].loc[:,['l1','l2','l3']] = 100 * (df_list[2].loc[:,['l1','l2','l3']] - 0.5) / (2 - 0.5)
+    df_list[2].loc[:,'ibias'] = 100 * (df_list[2].loc[:,'ibias'] - 0.000005) / (0.00002 - 0.000005)
+    # target_targets_5t_df
+    df_list[3].loc[:,'slewrate_pos'] = 100 * (df_list[3].loc[:,'slewrate_pos'] - 645632.611780252) / (10602059.8211294 - 645632.611780252)
+    df_list[3].loc[:,'dc_gain'] = 100 * (df_list[3].loc[:,'dc_gain'] - 0.020728808400004) / (292.707702161998 - 0.020728808400004)
+    df_list[3].loc[:,'ugf'] = 100 * (df_list[3].loc[:,'ugf'] - 1221065.9825421) / (100000000000 - 1221065.9825421)
+    df_list[3].loc[:,'phase_margin'] = 100 * (df_list[3].loc[:,'phase_margin'] + 12.2475159224187) / (149.258357674875 + 12.2475159224187)
+    df_list[3].loc[:,'cmrr'] = 100 * (df_list[3].loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
+    # source_features_two_stage_df
+    df_list[4].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[4].loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
+    df_list[4].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[4].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
+    df_list[4].loc[:,'cc'] = 100 * (df_list[4].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
+    df_list[4].loc[:,'cr'] = 100 * (df_list[4].loc[:,'cr'] - 500) / (100000 - 500) 
+    df_list[4].loc[:,'ibias'] = 100 * df_list[4].loc[:,'ibias']
+    # source_targets_two_stage_df
+    df_list[5].loc[:,'slewrate_pos'] = 100 * (df_list[5].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
+    df_list[5].loc[:,'dc_gain'] = 100 * (df_list[5].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
+    df_list[5].loc[:,'ugf'] = 100 * (df_list[5].loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    df_list[5].loc[:,'phase_margin'] = 100 * (df_list[5].loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
+    df_list[5].loc[:,'cmrr'] = 100 * (df_list[5].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
+    # target_features_two_stage_df
+    df_list[6].loc[:,['w1','w2','w3','w4','w5']] = 100 * (df_list[6].loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
+    df_list[6].loc[:,['l1','l2','l3','l4','l5']] = 100 * (df_list[6].loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
+    df_list[6].loc[:,'cc'] = 100 * (df_list[6].loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
+    df_list[6].loc[:,'cr'] = 100 * (df_list[6].loc[:,'cr'] - 500) / (100000 - 500) 
+    df_list[6].loc[:,'ibias'] = 100 * df_list[6].loc[:,'ibias']
+    # target_targets_two_stage_df
+    df_list[7].loc[:,'slewrate_pos'] = 100 * (df_list[7].loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
+    df_list[7].loc[:,'dc_gain'] = 100 * (df_list[7].loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
+    df_list[7].loc[:,'ugf'] = 100 * (df_list[7].loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    df_list[7].loc[:,'phase_margin'] = 100 * (df_list[7].loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
+    df_list[7].loc[:,'cmrr'] = 100 * (df_list[7].loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
 
 def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     A = A_input_df.copy()
@@ -74,20 +114,22 @@ def concat_dataset(A_input_df,B_input_df,C_input_df,D_input_df):
     output_df = pd.concat([A, B, C, D], ignore_index=True)
     return output_df
 
+
 def get_file_paths():
     """
     咱俩文件路径不一样，之后直接在这个文件里面修改容易点
     """
-    p1 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
-    p2 = 'dataset/dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
-    p3 = 'dataset/dataset/01_train_set/5t_opamp/target/target_design_features.csv'
-    p4 = 'dataset/dataset/01_train_set/5t_opamp/target/target_targets.csv'
-    p5 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
-    p6 = 'dataset/dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
-    p7 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
-    p8 = 'dataset/dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
+    p1 = 'dataset/01_train_set/5t_opamp/source/pretrain_design_features.csv'
+    p2 = 'dataset/01_train_set/5t_opamp/source/pretrain_targets.csv'
+    p3 = 'dataset/01_train_set/5t_opamp/target/target_design_features.csv'
+    p4 = 'dataset/01_train_set/5t_opamp/target/target_targets.csv'
+    p5 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_design_features.csv'
+    p6 = 'dataset/01_train_set/two_stage_opamp/source/pretrain_targets.csv'
+    p7 = 'dataset/01_train_set/two_stage_opamp/target/target_design_features.csv'
+    p8 = 'dataset/01_train_set/two_stage_opamp/target/target_targets.csv'
     path_list = [p1, p2, p3, p4, p5, p6, p7, p8]
     return path_list
+
 
 def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     """
@@ -109,17 +151,18 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     source_targets_two_stage_df = pd.read_csv(file_paths[5])
     target_features_two_stage_df = pd.read_csv(file_paths[6])
     target_targets_two_stage_df = pd.read_csv(file_paths[7])
-    for df in [source_features_5t_df, 
+    df_list = [source_features_5t_df, 
                source_targets_5t_df, 
                target_features_5t_df,
                target_targets_5t_df,
                source_features_two_stage_df,
                source_targets_two_stage_df, 
                target_features_two_stage_df, 
-               target_targets_two_stage_df]:
-        # 进行归一化
-        if normalize:
-            min_max_normalization(df)
+               target_targets_two_stage_df]
+    # 进行归一化
+    if normalize:
+        min_max_norm_cross(df_list)
+    for df in df_list:
         # 补零至13列
         pad_to_13(df)
 
@@ -176,6 +219,7 @@ def read_csv_to_df(file_paths, target_technology_ratio, normalize):
     
     return df_tuple
 
+
 def get_dataset_one_model(target_technology_ratio, normalize):
     (A_train_input_df, B_train_input_df, C_train_input_df, D_train_input_df, 
      A_train_output_df, B_train_output_df, C_train_output_df, D_train_output_df, 
@@ -198,6 +242,7 @@ def get_dataset_one_model(target_technology_ratio, normalize):
     D_test_dataset = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
     return train_dataset, A_test_dataset, B_test_dataset, C_test_dataset, D_test_dataset
 
+
 def get_dataset_four_models(target_technology_ratio, normalize):
     (A_train_input_df, B_train_input_df, C_train_input_df, D_train_input_df, 
      A_train_output_df, B_train_output_df, C_train_output_df, D_train_output_df, 
@@ -218,6 +263,7 @@ def get_dataset_four_models(target_technology_ratio, normalize):
     test_set_D = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
     return train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D
 
+
 def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
     file_paths = get_file_paths()
     source_features_5t_df = pd.read_csv(file_paths[0])
@@ -228,17 +274,18 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
     source_targets_two_stage_df = pd.read_csv(file_paths[5])
     target_features_two_stage_df = pd.read_csv(file_paths[6])
     target_targets_two_stage_df = pd.read_csv(file_paths[7])
-    for df in [source_features_5t_df, 
+    df_list = [source_features_5t_df, 
                source_targets_5t_df, 
                target_features_5t_df,
                target_targets_5t_df,
                source_features_two_stage_df,
                source_targets_two_stage_df, 
                target_features_two_stage_df, 
-               target_targets_two_stage_df]:
-        # 进行归一化
-        if normalize:
-            min_max_normalization(df)
+               target_targets_two_stage_df]
+    # 进行归一化
+    if normalize:
+        min_max_norm_cross(df_list)
+    for df in df_list:
         # 补零至13列
         pad_to_13(df)
     
@@ -326,21 +373,37 @@ def get_dataset_seperate(train_data_ratio, normalize, is_pretrain):
     test_set_C = OpampDataset(input = C_test_input_df, output = C_test_output_df, task_id = C_test_task_id_df, technology_type = C_test_technology_type_df)
     test_set_D = OpampDataset(input = D_test_input_df, output = D_test_output_df, task_id = D_test_task_id_df, technology_type = D_test_technology_type_df)
     return train_set_A,train_set_B,train_set_C,train_set_D, test_set_A, test_set_B, test_set_C, test_set_D
-                            
-    
+
+
 def get_val_dataset():
     input_A_df = pd.read_csv('dataset/02_public_test_set/features/features_A.csv')
     input_B_df = pd.read_csv('dataset/02_public_test_set/features/features_B.csv')
     input_C_df = pd.read_csv('dataset/02_public_test_set/features/features_C.csv')
     input_D_df = pd.read_csv('dataset/02_public_test_set/features/features_D.csv')
+    # normalization
+    input_A_df.loc[:,['w1','w2','w3']] = 100 * (input_A_df.loc[:,['w1','w2','w3']] - 0.5) / (50 - 0.5)
+    input_A_df.loc[:,['l1','l2','l3']] = 100 * (input_A_df.loc[:,['l1','l2','l3']] - 0.5) / (2 - 0.5)
+    input_A_df.loc[:,'ibias'] = 100 * (input_A_df.loc[:,'ibias'] - 0.000005) / (0.00002 - 0.000005)
+    input_B_df.loc[:,['w1','w2','w3','w4','w5']] = 100 * (input_B_df.loc[:,['w1','w2','w3','w4','w5']] - 0.5) / (50 - 0.5)
+    input_B_df.loc[:,['l1','l2','l3','l4','l5']] = 100 * (input_B_df.loc[:,['l1','l2','l3','l4','l5']] - 0.5) / (2 - 0.5)
+    input_B_df.loc[:,'cc'] = 100 * (input_B_df.loc[:,'cc'] - 0.0000000000001) / (0.000000000002 - 0.0000000000001)
+    input_B_df.loc[:,'cr'] = 100 * (input_B_df.loc[:,'cr'] - 500) / (100000 - 500) 
+    input_B_df.loc[:,'ibias'] = 100 * input_B_df.loc[:,'ibias']
+    input_C_df.loc[:,'slewrate_pos'] = 100 * (input_C_df.loc[:,'slewrate_pos'] - 645632.611780252) / (10602059.8211294 - 645632.611780252)
+    input_C_df.loc[:,'dc_gain'] = 100 * (input_C_df.loc[:,'dc_gain'] - 0.020728808400004) / (292.707702161998 - 0.020728808400004)
+    input_C_df.loc[:,'ugf'] = 100 * (input_C_df.loc[:,'ugf'] - 1221065.9825421) / (100000000000 - 1221065.9825421)
+    input_C_df.loc[:,'phase_margin'] = 100 * (input_C_df.loc[:,'phase_margin'] + 12.2475159224187) / (149.258357674875 + 12.2475159224187)
+    input_C_df.loc[:,'cmrr'] = 100 * (input_C_df.loc[:,'cmrr'] - 1.03019875662727) / (1416090.54834304 - 1.03019875662727)
+    input_D_df.loc[:,'slewrate_pos'] = 100 * (input_D_df.loc[:,'slewrate_pos'] - 0) / (262299959.900606 - 0)
+    input_D_df.loc[:,'dc_gain'] = 100 * (input_D_df.loc[:,'dc_gain'] - 0.006677072180007) / (41554.1940092721 - 0.006677072180007)
+    input_D_df.loc[:,'ugf'] = 100 * (input_D_df.loc[:,'ugf'] - 3791.34972457912) / (123495303.754714 - 3791.34972457912)
+    input_D_df.loc[:,'phase_margin'] = 100 * (input_D_df.loc[:,'phase_margin'] + 179.579391753632) / (179.989617050718 + 179.579391753632)
+    input_D_df.loc[:,'cmrr'] = 100 * (input_D_df.loc[:,'cmrr'] - 1.06801326426914) / (13243454.0487597 - 1.06801326426914)
+    # pad to 13 columns
     pad_to_13(input_A_df)
     pad_to_13(input_B_df)
     pad_to_13(input_C_df)
     pad_to_13(input_D_df)
-    min_max_normalization(input_A_df)
-    min_max_normalization(input_B_df)
-    min_max_normalization(input_C_df)
-    min_max_normalization(input_D_df)
     # task_id
     task_id_A = pd.DataFrame({'task_id': [0] * (len(input_A_df))})
     task_id_B = pd.DataFrame({'task_id': [1] * (len(input_B_df))})
