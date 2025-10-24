@@ -14,7 +14,7 @@ def inverse_norm(input_vec, task_id):
         elif tid == 2: # two_stage正推，输入应该为two_stage电路的target
             output_vec[b][0] = input_vec[b][0]/100 * (262299959.900606 - 0) + 0
             output_vec[b][1] = input_vec[b][1]/100 * (41554.1940092721 - 0.006677072180007) + 0.006677072180007
-            output_vec[b][2] = input_vec[b][2]/100 * (123495303.754714 - 3791.34972457912) + 3791.34972457912
+            output_vec[b][2] = input_vec[b][2]/100 * (1e11 - 3791.34972457912) + 3791.34972457912
             output_vec[b][3] = input_vec[b][3]/100 * (179.989617050718 + 179.579391753632) - 179.579391753632
             output_vec[b][4] = input_vec[b][4]/100 * (13243454.0487597 - 1.06801326426914) + 1.06801326426914
         elif tid == 3: # 5t反推，输入应该为5t电路的features
